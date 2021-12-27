@@ -6,7 +6,23 @@ def finder(ch, board):
     Rpos = []; Cpos = []
     for x in board:
         for y in x:
-            if y == ch.upper() or  y == ch.lower() :
+            if ch == "s" or ch == "S":
+                if y == ch:
+                    Rpos.append(R)
+                    Cpos.append(C)
+            elif ch == "x" or ch == "X":
+                if y == ch:
+                    Rpos.append(R)
+                    Cpos.append(C)
+            elif ch == "k" or ch == "K":
+                if y == ch:
+                    Rpos.append(R)
+                    Cpos.append(C)
+            elif ch == "t" or ch == "T":
+                if y == ch:
+                    Rpos.append(R)
+                    Cpos.append(C)
+            elif y == ch:
                 Rpos.append(R)
                 Cpos.append(C)
             C += 1
@@ -23,45 +39,81 @@ def printBoard(board):
     print(sf)
     
 """player movement"""
-def playerMove(Move, board, cboard):
+def playerMove(board, cboard):
     if Move == up:
         dummy = copy.deepcopy(cboard)
-        Prow, Pcol = finder("o", board)
+        Prow, Pcol = finder(Player, board)
         for i in range(len(Prow)):
-            if board[Prow[i]-1][Pcol[i]] != ".":
+            if Board[Prow[i]-1][Pcol[i]] != ".":
                 print("You lose!")
                 printBoard(board)
                 return exit()
             else:
                 Prow[i] = Prow[i] - 1
-                dummy[Prow[i]][Pcol[i]] = "o"
+                dummy[Prow[i]][Pcol[i]] = Player
                 x = copy.deepcopy(dummy)
         return x
 
 def moversMove(board, cboard, mboard, move):
-    Vrow, Vcol = finder("v", mboard)
-    Hrow, Hcol = finder("h", mboard)
+
+    # mboard = dusty(Vrmover, move, cboard, mboard)
+    # mboard = dusty(Vlmover, move, cboard, mboard)
+    mboard = dusty(Vumover, move, cboard, mboard)
+    # mboard = dusty(Vdmover, move, cboard, mboard)
+
+    # mboard = dusty(Hrmover, move, cboard, mboard)
+    # mboard = dusty(Hlmover, move, cboard, mboard)
+    mboard = dusty(Humover, move, cboard, mboard)
+    #mboard = dusty(Hdmover, move, cboard, mboard)
+    return mboard
+def dusty(x, move, cboard, mboard):
+    row, col = finder(x, mboard)
     dummy = copy.deepcopy(cboard)
-    k=0
-    for i in range(len(Vrow)):
+    k=mboard
+    for i in range(len(row)):
         if move == up:
-            Vrow[i] = Vrow[i] - 1
-            dummy[Vrow[i]][Vcol[i]] = "v"
+            if x == Vumover:
+                row[i] = row[i] - 1
+            elif x == Vdmover:
+                row[i] = row[i] + 1
+            elif x == Vrmover:
+                col[i] = col[i] + 1
+            elif x == Vlmover:
+                col[i] = col[i] - 1
+            dummy[row[i]][col[i]] = x
         elif move == down:
-            Vrow[i] = Vrow[i] + 1
-            dummy[Vrow[i]][Vcol[i]] = "v"
+            if x == Vumover:
+                row[i] = row[i] - 1
+            elif x == Vdmover:
+                row[i] = row[i] + 1
+            elif x == Vrmover:
+                col[i] = col[i] + 1
+            elif x == Vlmover:
+                col[i] = col[i] - 1
+            dummy[row[i]][col[i]] = x
         k = copy.deepcopy(dummy)
     return k
 
+up = "k"; down = "j"; left = "h"; right = "l"
 
-up = "8"
-down = "2"
-left = "4"
-right = "6"
+Player = "s" #or S
+Target = "t" #or T
+Wall = "x" #or X
 
-s = open("C:\\Users\\Jayden\\Code\\Python-Dev\\boards\\board_01.txt")
-Board = []
-Cboard = []
+Cvswitch = "v"; Ovswitch = "V"
+Chswitch = "h"; Ohswitch = "H"
+
+Key = "k" #or K
+Cport = "p"; Oport = "P"
+
+Hrmover = "r"; Hlmover = "l"; Humover = "u"; Hdmover = "d"
+Vrmover = "R"; Vlmover = "L"; Vumover = "U"; Vdmover = "D"
+
+s = open("C:\\Users\\Jayden\\Code\\Python-Dev\\boards\\board_06.txt")
+Title = s.readline()
+Dimentions = s.readline()
+
+Board = []; Cboard = []; Mboard = []
 for x in s:
     Dummy = []
     for y in x:
@@ -69,27 +121,33 @@ for x in s:
     Board.append(Dummy)
 s.close
 
-Prow, Pcol = finder("x", Board)
 Cboard = copy.deepcopy(Board)
 Mboard = copy.deepcopy(Board)
 Drow = 0; Dcol = 0
 Mrow = 0; Mcol = 0
 for x in Cboard:
     for y in x:
-        if y == "t" or y == "T" or y== "o" or y == "O":
+        if y == Target or y == Target.upper or y == Player or y == Player.upper:
             Mboard[Mrow][Mcol] = "."
-        if y != "x" and y!= "." and y != "t" and y!= "\n":
+        if y != Wall and y != Wall.upper and y != "." and y != Target and y != Target.upper and y != "\n":
             Cboard[Drow][Dcol] = "."    
         Dcol += 1
         Mcol += 1
     Drow += 1; Dcol = 0
     Mrow += 1; Mcol = 0
-#printBoard(Cboard)
+
+#Steps
+#Switches are turned on/off with boolean
+#Movers move
+#player moves
+#if not fail, update clear board
+printBoard(Board)
+d = moversMove(Board, Cboard, Mboard, up)
 Move = input()
 while Move != "":
-    Mboard = moversMove(Board, Cboard, Mboard, Move)
+    Mboard  = moversMove(Board, Cboard, Mboard, Move)
     printBoard(Mboard)
-    Board = playerMove(Move, Board, Cboard)
+    Board = playerMove(Board, Cboard)
     #printBoard(Board)
     Move = input()
 

@@ -1,5 +1,5 @@
 Test file
 3 3
-...
+..D
 s.t
-.u.
+.UU

@@ -1,7 +1,7 @@
 import copy
 
 """finds positions of characters"""
-def finder(ch, board):
+def finder(ch, board, cboard):
     R = 0; C = 0
     Rpos = []; Cpos = []
     for x in board:
@@ -28,21 +28,32 @@ def finder(ch, board):
             C += 1
         R += 1
         C = 0
-    return Rpos, Cpos
+
+    chBoard = writer(ch, Rpos, Cpos, cboard)
+
+    return Rpos, Cpos, chBoard
+
+def writer(ch, row, col, cboard):
+    dummy=copy.deepcopy(cboard)
+    k=copy.deepcopy(cboard)
+    for i in range(len(row)):
+        dummy[row[i]][col[i]] = ch
+        k = copy.deepcopy(dummy)
+    return k
+
 
 """prints boards in nice format"""
 def printBoard(board):
-    sf = ""
+    b = ""
     for x in board:
         for y in x:
-            sf += y        
-    print(sf)
+            b += y        
+    print(b)
     
 """player movement"""
-def playerMove(board, cboard):
+def playerMove(board, cboard, Prow, Pcol):
     if Move == up:
         dummy = copy.deepcopy(cboard)
-        Prow, Pcol = finder(Player, board)
         for i in range(len(Prow)):
             if Board[Prow[i]-1][Pcol[i]] != ".":
                 print("You lose!")
@@ -54,65 +65,120 @@ def playerMove(board, cboard):
                 x = copy.deepcopy(dummy)
         return x
 
-def moversMove(board, cboard, mboard, move):
+def qMoversMove(board, cboard, mboard, move):
+    #move, assign to new board
+    #merge boards, by getting posstions on each board, then writing to mboard
 
-    # mboard = dusty(Vrmover, move, cboard, mboard)
-    # mboard = dusty(Vlmover, move, cboard, mboard)
-    mboard = dusty(Vumover, move, cboard, mboard)
-    # mboard = dusty(Vdmover, move, cboard, mboard)
+    prow, pcol, pboard = finder(Player, Board, Cboard)
+    trow, tcol, tboard = finder(Target, board, cboard)
+    cvsrow, cvscol, cvsboard = finder(Cvswitch, board, cboard)
+    chsrow, chscol, chsboard = finder(Chswitch, board, cboard)
+    ohsrow, ohscol, ohsboard = finder(Ohswitch, board, cboard)
+    ovsrow, ovscol, ovsboard = finder(Ovswitch, board, cboard)
 
-    # mboard = dusty(Hrmover, move, cboard, mboard)
-    # mboard = dusty(Hlmover, move, cboard, mboard)
-    mboard = dusty(Humover, move, cboard, mboard)
-    #mboard = dusty(Hdmover, move, cboard, mboard)
-    return mboard
-def dusty(x, move, cboard, mboard):
-    row, col = finder(x, mboard)
+    krow, kcol, kboard = finder(Key, board, cboard)
+    cprow, cpcol, cpboard = finder(Cport, board, cboard)
+    oprow, opcol, opboard = finder(Oport, board, cboard)
+
+    hrmrow, hrmcol, hrmboard = finder(Hrmover, board, cboard)
+    hlmrow, hlmcol, hlmboard = finder(Hlmover, board, cboard)
+    humrow, humcol, humboard = finder(Humover, board, cboard)
+    hdmrow, hdmcol, hdmboard = finder(Hdmover, board, cboard)
+    vrmrow, vrmcol, vrmboard = finder(Vrmover, board, cboard)
+    vlmrow, vlmcol, vlmboard = finder(Vlmover, board, cboard)
+    vumrow, vumcol, vumboard = finder(Vumover, board, cboard)
+    vdmrow, vdmcol, vdmboard = finder(Vdmover, board, cboard)
+    
+    vumboard = moverMove(Vumover, move, cboard, vumboard, vumrow, vumcol)
+    vdmboard = moverMove(Vdmover, move, cboard, vdmboard, vdmrow, vdmcol)
+    vlmboard = moverMove(Vlmover, move, cboard, vlmboard, vlmrow, vlmcol)
+    vrmboard = moverMove(Vrmover, move, cboard, vrmboard, vrmrow, vrmcol)
+
+    humboard = moverMove(Humover, move, cboard, humboard, humrow, humcol)
+    hdmboard = moverMove(Hdmover, move, cboard, hdmboard, hdmrow, hdmcol)
+    hlmboard = moverMove(Hlmover, move, cboard, hlmboard, hlmrow, hlmcol)
+    hrmboard = moverMove(Hrmover, move, cboard, hrmboard, hrmrow, hrmcol)
+    
+    
+    d = copy.deepcopy(vdmboard)
+    print("^^^")
+    return d
+
+def moverMove(m, move, cboard, currboard, row, col):
     dummy = copy.deepcopy(cboard)
-    k=mboard
+    k=currboard
     for i in range(len(row)):
         if move == up:
-            if x == Vumover:
+            if m == Vumover:
                 row[i] = row[i] - 1
-            elif x == Vdmover:
-                row[i] = row[i] + 1
-            elif x == Vrmover:
+            elif m == Vdmover:
+                if row[i] + 1 > len(row)+1:
+                    row[i] = 0
+                else:
+                    row[i] = row[i] + 1
+            elif m == Vrmover:
                 col[i] = col[i] + 1
-            elif x == Vlmover:
+            elif m == Vlmover:
                 col[i] = col[i] - 1
-            dummy[row[i]][col[i]] = x
+            elif m == Player:
+                row[i] = row[i] - 1
+            dummy[row[i]][col[i]] = m
+
         elif move == down:
-            if x == Vumover:
+            if m == Vumover:
                 row[i] = row[i] - 1
-            elif x == Vdmover:
+            elif m == Vdmover:
                 row[i] = row[i] + 1
-            elif x == Vrmover:
+            elif m == Vrmover:
                 col[i] = col[i] + 1
-            elif x == Vlmover:
+            elif m == Vlmover:
                 col[i] = col[i] - 1
-            dummy[row[i]][col[i]] = x
+            elif m == Player:
+                row[i] = row[i] + 1
+            dummy[row[i]][col[i]] = m
+        elif move == left:
+            if m == Humover:
+                row[i] = row[i] - 1
+            elif m == Hdmover:
+                row[i] = row[i] + 1
+            elif m == Hrmover:
+                col[i] = col[i] + 1
+            elif m == Hlmover:
+                col[i] = col[i] - 1
+            elif m == Player:
+                col[i] = col[i] - 1
+            dummy[row[i]][col[i]] = m
+        elif move == right:
+            if m == Humover:
+                row[i] = row[i] - 1
+            elif m == Hdmover:
+                row[i] = row[i] + 1
+            elif m == Hrmover:
+                col[i] = col[i] + 1
+            elif m == Hlmover:
+                col[i] = col[i] - 1
+            elif m == Player:
+                col[i] = col[i] + 1
+            dummy[row[i]][col[i]] = m
         k = copy.deepcopy(dummy)
     return k
+
 
 up = "k"; down = "j"; left = "h"; right = "l"
 
 Player = "s" #or S
 Target = "t" #or T
 Wall = "x" #or X
-
 Cvswitch = "v"; Ovswitch = "V"
 Chswitch = "h"; Ohswitch = "H"
-
 Key = "k" #or K
 Cport = "p"; Oport = "P"
-
 Hrmover = "r"; Hlmover = "l"; Humover = "u"; Hdmover = "d"
 Vrmover = "R"; Vlmover = "L"; Vumover = "U"; Vdmover = "D"
 
 s = open("C:\\Users\\Jayden\\Code\\Python-Dev\\boards\\board_06.txt")
 Title = s.readline()
 Dimentions = s.readline()
-
 Board = []; Cboard = []; Mboard = []
 for x in s:
     Dummy = []
@@ -141,14 +207,37 @@ for x in Cboard:
 #Movers move
 #player moves
 #if not fail, update clear board
-printBoard(Board)
-d = moversMove(Board, Cboard, Mboard, up)
+printBoard(Cboard)
+
+prow, pcol, pboard = finder(Player, Board, Cboard)
+    # trow, tcol, tboard = finder(Target, Board, Cboard)
+    # cvsrow, cvscol, cvsboard = finder(Cvswitch, Board, Cboard)
+    # chsrow, chscol, chsboard = finder(Chswitch, Board, Cboard)
+    # ohsrow, ohscol, ohsboard = finder(Ohswitch, Board, Cboard)
+    # ovsrow, ovscol, ovsboard = finder(Ovswitch, Board, Cboard)
+    # krow, kcol, kboard = finder(Key, Board, Cboard)
+    # cprow, cpcol, cpboard = finder(Cport, Board, Cboard)
+    # oprow, opcol, opboard = finder(Oport, Board, Cboard)
+    # hrmrow, hrmcol, hrmboard = finder(Hrmover, Board, Cboard)
+    # hlmrow, hlmcol, hlmboard = finder(Hlmover, Board, Cboard)
+    # humrow, humcol, humboard = finder(Humover, Board, Cboard)
+    # hdmrow, hdmcol, hdmboard = finder(Hdmover, Board, Cboard)
+    # vrmrow, vrmcol, vrmboard = finder(Vrmover, Board, Cboard)
+    # vlmrow, vlmcol, vlmboard = finder(Vlmover, Board, Cboard)
+    #vumrow, vumcol, vumboard = finder(Vumover, Board, Cboard)
+    # vdmrow, vdmcol, vdmboard = finder(Vdmover, Board, Cboard)
+
 Move = input()
 while Move != "":
-    Mboard  = moversMove(Board, Cboard, Mboard, Move)
-    printBoard(Mboard)
-    Board = playerMove(Board, Cboard)
-    #printBoard(Board)
+    Board  = qMoversMove(Board, Cboard, Mboard, Move)
+    #printBoard(Mboard)
+    print("-----")
+    printBoard(Board)
+    print("-----")
+    #g = playerMove(Board, Cboard, prow, pcol)
+    g = moverMove(Player, Move, Cboard, pboard, prow, pcol)
+    prow, pcol, pboard = finder(Player, g, Cboard)
+    printBoard(pboard)
     Move = input()
 
 

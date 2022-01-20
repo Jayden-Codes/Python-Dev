@@ -1,2 +1,4 @@
-Mfile = open("C:\\Users\\Jayden\\Code\\Python-Dev\\boards\\moves_"+ BNumber+ ".txt")
-# mf
+ # while inp != up and inp != down and inp != left and inp != right and inp != "x":
+    #     print("Incorrect input")
+    #     printBoard(Board)
+    #     inp = 
